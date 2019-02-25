@@ -2,6 +2,9 @@ package com.pinyougou.sellergoods.service.impl;
 
 import java.util.List;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -18,6 +21,18 @@ public class BrandServiceImpl implements BrandService {
 	public List<TbBrand> findAll() {
 
 		return brandMapper.selectByExample(null);
+	}
+
+	@Override
+	public PageResult findPage(Integer pageNum, Integer pageSize) {
+		PageHelper.startPage(pageNum, pageSize);
+		Page<TbBrand> page= (Page<TbBrand>) brandMapper.selectByExample(null);
+		return new PageResult(page.getTotal(),page.getResult());
+	}
+
+	@Override
+	public void add(TbBrand brand) {
+		brandMapper.insert(brand);
 	}
 
 }
