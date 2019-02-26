@@ -20,7 +20,34 @@
 
         //品牌列表
         var app = angular.module("pinyougou", ['pagination']);
-        app.controller('brandController', function ($scope, $http) {
+        app.service('brandService', function ($http) {
+            //根据id查询Brand
+            this.findOne = function (id) {
+                return $http.get('../brand/findOne.do?id=' + id);
+            };
+
+            //新增
+            this.add = function (entity) {
+                return $http.post('../brand/add.do', entity);
+            };
+            //修改
+            this.update = function (entity) {
+                return $http.post('../brand/update.do', entity);
+            };
+
+            //删除
+            this.dele = function (ids) {
+                return $http.get('../brand/delete.do?ids=' + ids);
+            };
+
+            //条件查询
+
+            this.search = function (page, rows, searchEntity) {
+                return $http.post('../brand/search.do?page=' + page + '&rows=' + rows, searchEntity);
+            }
+
+        });
+        app.controller('brandController', function ($scope, $http, brandService) {
             /*
                            //所有查询所有品牌列表
                            $scope.findAll = function () {
@@ -47,13 +74,13 @@
                     $scope.reloadList();//重新加载
                 }
             };
-          /*  //定义findPage方法,发起分页查询Brand的请求
-            $scope.findPage = function (page, rows) {
-                $http.get('../brand/findPage.do?page=' + page + '&rows=' + rows).success(function (pageResult) {
-                    $scope.brandList = pageResult.rows;//每页显示的记录
-                    $scope.paginationConf.totalItems = pageResult.total;//更新总记录数
-                })
-            };*/
+            /*  //定义findPage方法,发起分页查询Brand的请求
+              $scope.findPage = function (page, rows) {
+                  $http.get('../brand/findPage.do?page=' + page + '&rows=' + rows).success(function (pageResult) {
+                      $scope.brandList = pageResult.rows;//每页显示的记录
+                      $scope.paginationConf.totalItems = pageResult.total;//更新总记录数
+                  })
+              };*/
 
             /*  //保存
               $scope.save = function () {
@@ -70,7 +97,7 @@
 
             //根据id查询Brand
             $scope.findOne = function (id) {
-                $http.get('../brand/findOne.do?id=' + id).success(function (brand) {
+                brandService.findOne(id).success(function (brand) {
                     $scope.entity = brand;
                 })
             };
@@ -78,11 +105,13 @@
             //新增和修改的功能
             $scope.save = function () {
 
-                var methodName = 'add';
+                var object = null;
                 if ($scope.entity.id != null) {//如果有id就执行修改方法
-                    methodName = 'update';
+                    object = brandService.update($scope.entity);
+                } else {
+                    object = brandService.add($scope.entity)
                 }
-                $http.post('../brand/' + methodName + '.do', $scope.entity).success(function (result) {
+                object.success(function (result) {
                     if (result.success) {
                         $scope.reloadList();
                     } else {
@@ -103,7 +132,7 @@
                 }
             };
             $scope.dele = function () {
-                $http.get('../brand/delete.do?ids=' + $scope.selectIds).success(function (result) {
+                brandService.dele($scope.selectIds).success(function (result) {
                     if (result.success) {
                         $scope.reloadList();
                     } else {
@@ -111,16 +140,15 @@
                     }
                 })
             };
-            
+
             //条件查询
-            $scope.searchEntity={};//定义搜索对象
-            $scope.search=function (page,rows) {
-                $http.post('../brand/search.do?page='+page+'&rows='+rows,$scope.searchEntity).success(function (pageResult) {
-                    $scope.brandList=pageResult.rows;//每页显示的数据
-                    $scope.paginationConf.totalItems=pageResult.total;//更新总记录数
+            $scope.searchEntity = {};//定义搜索对象
+            $scope.search = function (page, rows) {
+                brandService.search(page,rows,$scope.searchEntity).success(function (pageResult) {
+                    $scope.brandList = pageResult.rows;//每页显示的数据
+                    $scope.paginationConf.totalItems = pageResult.total;//更新总记录数
                 })
             }
-
         });
 
 
@@ -156,7 +184,7 @@
         <div class="box-tools pull-right">
             <div class="has-feedback">
                 品牌名称:<input ng-model="searchEntity.name"> 品牌首字母:<input ng-model="searchEntity.firstChar">
-                <button  class="btn btn-default" ng-click="reloadList()">查询</button>
+                <button class="btn btn-default" ng-click="reloadList()">查询</button>
             </div>
         </div>
         <div class="box-tools pull-right">
