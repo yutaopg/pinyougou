@@ -22,4 +22,21 @@ public interface BrandService {
      * 品牌管理:增加
      */
     public void add(TbBrand brand);
+
+
+    //修改
+    void update(TbBrand brand);
+
+    //根据id查找,用于回显
+    TbBrand findOne(Long id);
+
+    //多条删除
+    void delete(Long[] ids);
+
+    /**
+     * *
+     * @param pageNum 当前页 码
+     * @param  pageSize 每页记录数
+     */
+    public PageResult findPage(TbBrand brand, int pageNum,int pageSize);
 }
