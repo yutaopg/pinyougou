@@ -2,7 +2,10 @@ package com.pinyougou.mapper;
 
 import com.pinyougou.pojo.TbBrand;
 import com.pinyougou.pojo.TbBrandExample;
+
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface TbBrandMapper {
@@ -19,6 +22,8 @@ public interface TbBrandMapper {
     List<TbBrand> selectByExample(TbBrandExample example);
 
     TbBrand selectByPrimaryKey(Long id);
+
+    List<Map> selectOptionList();
 
     int updateByExampleSelective(@Param("record") TbBrand record, @Param("example") TbBrandExample example);
 
